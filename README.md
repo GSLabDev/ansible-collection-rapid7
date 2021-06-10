@@ -95,7 +95,7 @@ Here are some examples of how to use the module.
 - hosts: localhost
   # Call the collections to use the respective modules
   collections:
-    - rapid7_insightvm
+    - idmsubs.rapid7_insightvm
   tasks:
      - name: Launch a scan on site assets
        r7_insightvm_scan: 
@@ -121,7 +121,7 @@ Here are some examples of how to use the module.
 - hosts: localhost
   # Call the collections to use the respective modules
   collections:
-    - rapid7_insightvm
+    - idmsubs.rapid7_insightvm
   tasks: 
     - name: Generate scan report
       r7_insightvm_report:
@@ -149,7 +149,7 @@ Alternative way
 - hosts: localhost
   tasks:
     - name: Launch a scan on site assets on scan sites
-      rapid7_insightvm.r7_insightvm_scan:
+      idmsubs.rapid7_insightvm.r7_insightvm_scan:
        action: "create"
        hostname: "{{rapid7_host}}"
        username: "{{rapid7_user}}"
@@ -171,7 +171,7 @@ Alternative way
 - hosts: localhost
   tasks:
     - name: To generate a scan report
-      rapid7_insightvm.r7_insightvm_report:
+      idmsubs.rapid7_insightvm.r7_insightvm_report:
        action: "download"
        hostname: "{{rapid7_host}}"
        username: "{{rapid7_user}}"

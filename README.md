@@ -1,5 +1,5 @@
 # Ansible Modules for Rapid7 InsightVM Scan Launch and Report Generation 
-[Ansible-Galaxy collections](https://github.com/GSLabDev/ansible-collection-rapid7.git)) 
+[Ansible-Galaxy collections](https://github.com/GSLabDev/ansible-collection-rapid7.git)
 repository to create a scan and generate report.
 
 ## Installation

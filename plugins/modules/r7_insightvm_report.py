@@ -62,7 +62,7 @@ options:
        type:str
 
  author:
-   - Aishwarya Bhosale (@aishwarya128)
+   - GS Lab (@idmsubs)
         
 '''
 EXAMPLES = r'''

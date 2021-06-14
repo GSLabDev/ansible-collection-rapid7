@@ -16,6 +16,9 @@ version_added: "1.0.0"
 description: This module will be used to generate custom report using sql queries for a given scan and site
 
 options:
+     action: Action name "download" to download a scan report
+        required: true
+        type: str
      hostname:  
         description: Host url/host ip address to connect insightvm instance
         required: true
@@ -68,6 +71,7 @@ options:
 EXAMPLES = r'''
 - name: Generate scan report
   r7_insightvm_report:
+    action: download
     hostname: "https://rapid7_insightvm:3780"
     username: "admin"
     password: "password"
@@ -90,7 +94,7 @@ import json
 import requests
 import time
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common_utils import get_connection
+#from ansible.module_utils.common_utils import get_connection
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
@@ -98,7 +102,10 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 class GenerateReport(object):
     def __init__(self,client):
-       self.hostname,self.username,self.password = get_connection(client)
+       #self.hostname,self.username,self.password = get_connection(client)
+       self.hostname = client.params['hostname']
+       self.username = client.params['username']
+       self.password = client.params['password']
        self.report_name = client.params['report_name']
        self.site_scope = client.params['site_scope']
        self.format = client.params['format']
@@ -254,4 +261,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-    

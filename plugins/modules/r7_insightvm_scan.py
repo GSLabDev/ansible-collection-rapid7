@@ -11,13 +11,16 @@ DOCUMENTATION = r'''
 ---
 module: r7_insightvm_scan
 
-short_description: Module to create a scan on site assets
+short_description: Module to launch a scan on site assets
 
 version_added: "1.0.0"
 
 description: This module will be used to trigger a scan on selected scan site by user
 
 options:
+    action: Action name "create" to trigger a scan 
+        required: true
+        type: str
     hostname:  
         description: Host url/host ip address to connect insightvm instance
         required: true
@@ -57,8 +60,10 @@ author:
 '''
 
 EXAMPLES = r'''
+# Pass in a message
  - name: Launch a scan on site assets
    r7_insightvm_scan: 
+    action: create
     hostname: "https://rapid7_insightvm:3780:
     username: "admin"
     password: "admin"
@@ -75,11 +80,12 @@ EXAMPLES = r'''
         msg : "{{output}}"
 '''
 
+#from lib.ansible.module_utils.common_utils import get_entity_id
 from ansible.module_utils.basic import *
 import json
 import requests
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common_utils import get_entity_id
+#from ansible.module_utils.common_utils import get_entity_id
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
@@ -103,21 +109,45 @@ class TriggerScan(object):
         if self.action == "create":
             result = self.launch_scan(module)
             return result
+    
+    def get_entity_id(self,url,module,payload=None,method=None):
+        
+        client = module
+        username = client.params['username']
+        password = client.params['password']
+        entity_id = None
+        link = url
+        try:
+            print("in get enrity id func")
+            response = requests.get(url=link,auth=(username,password),json=payload,headers={'Content-Type':'application/json'},verify=False)
+            parsed_response = json.loads(response.content)
+            #print("resp2",parsed_response)
+            for item in parsed_response['resources']:
+                if item['name'] == payload:
+                    entity_id = item['id']
+                    print("id:",entity_id)
+            if entity_id:
+                return entity_id
+            else:
+                client.fail_json("Failed to get resource id for "+payload,changed=False)
+        
+        except Exception as e:
+           return ("Failed to get id",str(e))
 
     def launch_scan(self,client):
         try:
             
             #get scan engine id
             url1 = self.hostname + "/api/3/scan_engines"
-            scan_engine_type_id = get_entity_id(url=url1,module=client,method="GET",payload=self.scan_engine_type)
+            scan_engine_type_id = self.get_entity_id(url=url1,module=client,method="GET",payload=self.scan_engine_type)
             if scan_engine_type_id:
                 # get scan site id
                 url2 = self.hostname + "/api/3/sites"
-                scan_site_id = get_entity_id(url=url2,module=client, method="GET",payload=self.scan_site)
+                scan_site_id = self.get_entity_id(url=url2,module=client, method="GET",payload=self.scan_site)
                 if scan_site_id:
                     # get scan template id
                     url3 = self.hostname + "/api/3/scan_templates"
-                    scan_template_id = get_entity_id(url=url3,module=client,method="GET",payload=self.scan_template)
+                    scan_template_id = self.get_entity_id(url=url3,module=client,method="GET",payload=self.scan_template)
            
             # launch scan
             parameters = {
@@ -139,7 +169,7 @@ class TriggerScan(object):
                 return parsed_response
             
         except Exception as e:
-           client.fail_json("Failed to trigger a scan"+str(e),changed=False)
+           client.fail_json("Failed to trigger a scan "+str(e),changed=False)
 
 def main():
  
